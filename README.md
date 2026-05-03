@@ -21,14 +21,14 @@ In large Bash projects, it is common to source utility or configuration files ac
 Add the following line to the top of the script you wish to protect:
 
 ```bash
-source path/to/pragma_once.sh && return 0;
+source path/to/pragma_once.sh || return 0;
 ```
 
 ### 2. Handling Subdirectories
 If you are sourcing the utility from a subdirectory, use the following pattern to ensure the path is resolved correctly:
 
 ```bash
-source $(dirname $(realpath ${BASH_SOURCE[0]}))/../pragma_once.sh && return 0;
+source $(dirname $(realpath ${BASH_SOURCE[0]}))/../pragma_once.sh || return 0;
 ```
 
 ## 📋 Requirements
