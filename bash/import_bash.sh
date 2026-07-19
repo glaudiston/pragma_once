@@ -3,7 +3,7 @@
 # import_bash take care of pragma once and relative path issues, and other things like avoiding circular deps;
 #
 # shellcheck disable=SC2317,SC2329
-. ./pragma_once.sh || return 0
+. "$(dirname "$(realpath "${BASH_SOURCE[0]}" --relative-to .)")"/pragma_once.sh || return 0
 # this script will iterate all arguments importing they as source, only if they are not imported already, and if no arguments are given it will read it from stdin;
 
 set -eumo pipefail;
