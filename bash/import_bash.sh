@@ -53,13 +53,21 @@ import_bash(){
 	pragma_once_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")";
 	csd="$(dirname "$(realpath "${BASH_SOURCE[1]}")")";
 	for (( i=0; i<${#sources[@]}; i++ )); do
+		#echo importing ${sources[i]} >&2
 		local PRAGMA_SOURCE_FILE;
-		PRAGMA_SOURCE_FILE="$(realpath "${sources[i]}" --relative-to . 2>&1 || true)";
-		[ ! -f "$PRAGMA_SOURCE_FILE" ] && continue;
-		source "${pragma_once_dir}/pragma_once.sh" || {
-			echo "failed to import ${pragma_once_dir}/pragma_once.sh">&2
+		PRAGMA_SOURCE_FILE="$(realpath "$csd/${sources[i]}" 2>&1 || true)";
+		#echo pragma $PRAGMA_SOURCE_FILE >&2
+		[ ! -f "$PRAGMA_SOURCE_FILE" ] && {
+			#echo ERROR to import file not found: $PRAGMA_SOURCE_FILE
 			continue;
 		}
-		source "$csd/${sources[i]}";
+		source "${pragma_once_dir}/pragma_once.sh" || {
+			#echo "failed to import ${pragma_once_dir}/pragma_once.sh">&2
+			continue;
+		}
+		source "$csd/${sources[i]}" && {
+			# echo "imported $csd/${sources[i]}" >&2;
+			:
+		}
 	done
 }
