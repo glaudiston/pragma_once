@@ -7,10 +7,12 @@
 # dependencies: 
 #   - md5sum
 #   - realpath
+PRAGMA_SOURCE_IDX=${PRAGMA_SOURCE_IDX:-1}
+PRAGMA_SOURCE_FILE="${PRAGMA_SOURCE_FILE:-${BASH_SOURCE[PRAGMA_SOURCE_IDX]}}"
 if [[ -z "${BASH_VERSION}" || ${BASH_VERSINFO[0]} -lt 4 ]]; then
-	src="$(realpath "${BASH_SOURCE[1]}")"; # the caller script that sourced the pragma_once
+	src="$(realpath "${PRAGMA_SOURCE_FILE}")"; # the caller script that sourced the pragma_once
 	#echo "checking pragma_once for $src" >&2
-	srckey=$(echo $src|md5sum|cut -d' ' -f1);
+	srckey=$(echo "$src"|md5sum|cut -d' ' -f1);
 	v_prev="_${srckey}_md5_previous";
 	declare v_curr="_${srckey}_md5";
 	declare "$v_prev"="${!v_curr:-}";
@@ -20,9 +22,9 @@ if [[ -z "${BASH_VERSION}" || ${BASH_VERSINFO[0]} -lt 4 ]]; then
 fi
 
 declare -g -A __SOURCED_CACHE
-src="$(realpath "${BASH_SOURCE[1]}")"
+src="$(realpath "${PRAGMA_SOURCE_FILE}")"
 curr_hash=$(md5sum "$src" | cut -d' ' -f1)
 result=1
 [[ "${__SOURCED_CACHE[$src]:-}" != "$curr_hash" ]] && result=0 # allow load the file
 __SOURCED_CACHE["$src"]="$curr_hash"
-return $result
+return "$result"
