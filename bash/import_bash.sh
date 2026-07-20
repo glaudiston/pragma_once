@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+#!/bin/bash
 # import_bash take care of pragma once and relative path issues, and other things like avoiding circular deps;
 #
 # shellcheck disable=SC2317,SC2329
@@ -52,21 +52,23 @@ import_bash(){
 	local pragma_once_dir;
 	pragma_once_dir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")";
 	csd="$(dirname "$(realpath "${BASH_SOURCE[1]}")")";
-	for (( i=0; i<${#sources[@]}; i++ )); do
-		#echo importing ${sources[i]} >&2
+	for file in ${sources[@]}; do
+		#echo "importing $file..." >&2
 		local PRAGMA_SOURCE_FILE;
-		PRAGMA_SOURCE_FILE="$(realpath "$csd/${sources[i]}" 2>&1 || true)";
-		#echo pragma $PRAGMA_SOURCE_FILE >&2
+		PRAGMA_SOURCE_FILE="$(realpath "$csd/$file" 2>&1 || true)";
 		[ ! -f "$PRAGMA_SOURCE_FILE" ] && {
-			#echo ERROR to import file not found: $PRAGMA_SOURCE_FILE
+			echo ERROR to import file not found: $PRAGMA_SOURCE_FILE
 			continue;
+		}
+		[ ! -f "${pragma_once_dir}/pragma_once.sh" ] && {
+			echo "ERROR ${pragma_once_dir}/pragma_once.sh not found" >&2;
 		}
 		source "${pragma_once_dir}/pragma_once.sh" || {
-			#echo "failed to import ${pragma_once_dir}/pragma_once.sh">&2
+			#echo "already loaded ${pragma_once_dir}/pragma_once.sh">&2
 			continue;
 		}
-		source "$csd/${sources[i]}" && {
-			# echo "imported $csd/${sources[i]}" >&2;
+		source "${PRAGMA_SOURCE_FILE}" && {
+			#echo "imported $PRAGMA_SOURCE_FILE" >&2;
 			:
 		}
 	done
